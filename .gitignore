@@ -54,3 +54,10 @@ server.log
 /skills/upload/
 /download/
 /scripts/
+
+# Exclude sensitive screenshots, skills, worklog from public repo
+/upload/
+/skills/
+/worklog.md
+/.zscripts/
+/scripts/
