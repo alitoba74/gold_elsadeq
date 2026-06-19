@@ -9,6 +9,7 @@ import { getDict } from "@/lib/i18n/dictionaries";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Newspaper, ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
+import { Breadcrumbs } from "@/components/elsadeq/breadcrumbs";
 
 interface NewsItem {
   id: string;
@@ -46,6 +47,7 @@ export default function NewsPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-3 sm:px-4 lg:px-6 py-6 pb-24 lg:pb-12">
+      <Breadcrumbs items={[{ label: t.nav.home, href: "/" }, { label: t.nav.news }]} />
       <header className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gold-gradient font-display flex items-center gap-2">
           <Newspaper className="h-6 w-6 text-gold" />

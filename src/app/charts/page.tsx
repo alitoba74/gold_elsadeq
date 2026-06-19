@@ -26,6 +26,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp } from "lucide-react";
+import { Breadcrumbs } from "@/components/elsadeq/breadcrumbs";
 
 const ITEMS = [
   { key: "gold_24k", labelAr: "ذهب عيار 24", labelEn: "Gold 24K" },
@@ -85,6 +86,7 @@ export default function ChartsPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-3 sm:px-4 lg:px-6 py-6 pb-24 lg:pb-12">
+      <Breadcrumbs items={[{ label: t.nav.home, href: "/" }, { label: t.nav.charts }]} />
       <header className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gold-gradient font-display">
           {t.charts.title}

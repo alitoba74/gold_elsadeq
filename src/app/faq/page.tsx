@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { ChevronDown, HelpCircle } from "lucide-react";
+import { Breadcrumbs } from "@/components/elsadeq/breadcrumbs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useLocaleState } from "@/components/elsadeq/locale-state";
 import { getDict } from "@/lib/i18n/dictionaries";
@@ -82,8 +83,27 @@ export default function FAQPage() {
   const t = getDict(locale);
   const faqs = FAQS[locale];
 
+  // Build FAQ JSON-LD for Rich Snippets
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: f.a,
+      },
+    })),
+  };
+
   return (
     <div className="mx-auto max-w-3xl px-3 sm:px-4 lg:px-6 py-6 pb-24 lg:pb-12">
+      <Breadcrumbs items={[{ label: t.nav.home, href: "/" }, { label: t.nav.faq }]} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <header className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gold-gradient font-display flex items-center gap-2">
           <HelpCircle className="h-6 w-6 text-gold" />

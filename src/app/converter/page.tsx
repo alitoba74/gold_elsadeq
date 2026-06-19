@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Breadcrumbs } from "@/components/elsadeq/breadcrumbs";
 import { usePrices } from "@/hooks/use-prices";
 import { useLocaleState } from "@/components/elsadeq/locale-state";
 import { getDict } from "@/lib/i18n/dictionaries";
@@ -50,6 +51,7 @@ export default function ConverterPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-3 sm:px-4 lg:px-6 py-6 pb-24 lg:pb-12">
+      <Breadcrumbs items={[{ label: t.nav.home, href: "/" }, { label: t.nav.converter }]} />
       <header className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gold-gradient font-display">
           {t.converter.title}

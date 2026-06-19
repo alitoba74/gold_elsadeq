@@ -122,7 +122,7 @@ function parseRssXml(xml: string): {
     const link = stripTags(extract(block, "link")) || extractAttr(block, "link", "href") || "";
     const description = extract(block, "description");
     const content = extract(block, "content:encoded") || extract(block, "content");
-    const pubDate = extract(block, "pubDate") || extract(block, "published") || extract(block, "updated");
+    const pubDateRaw = extract(block, "pubDate") || extract(block, "published") || extract(block, "updated");
 
     let imageUrl =
       extractAttr(block, "enclosure", "url") ||
@@ -140,7 +140,7 @@ function parseRssXml(xml: string): {
         summary: stripTags(description).slice(0, 280),
         content: stripTags(content),
         imageUrl,
-        pubDate: pubDate ? new Date(pubDate).toISOString() : undefined,
+        pubDate: parseDate(pubDateRaw),
       });
     }
   };
@@ -150,4 +150,41 @@ function parseRssXml(xml: string): {
   while ((m = entryRegex.exec(xml)) !== null) processBlock(m[1]);
 
   return items;
+}
+
+/**
+ * Parse dates from multiple RSS feed formats:
+ *  - RFC822: "Fri, 19 Jun 2026 12:45:52 +0300" (Al Jazeera, standard RSS)
+ *  - ISO 8601: "2026-06-19T12:45:52Z" (Atom feeds)
+ *  - MySQL: "2026-06-19 13:07:36" (Investing.com)
+ *  - Unix timestamp (seconds or ms)
+ */
+function parseDate(raw: string | null): string | undefined {
+  if (!raw) return undefined;
+
+  const s = raw.trim();
+
+  // Try native Date parse first (handles RFC822 + ISO)
+  const native = new Date(s);
+  if (!isNaN(native.getTime())) {
+    return native.toISOString();
+  }
+
+  // Try MySQL format: "2026-06-19 13:07:36" -> assume UTC
+  const mysqlMatch = s.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})$/);
+  if (mysqlMatch) {
+    const [, y, mo, d, h, mi, se] = mysqlMatch;
+    const dt = new Date(Date.UTC(+y, +mo - 1, +d, +h, +mi, +se));
+    if (!isNaN(dt.getTime())) return dt.toISOString();
+  }
+
+  // Try Unix timestamp
+  if (/^\d{10}$/.test(s) || /^\d{13}$/.test(s)) {
+    const ts = Number(s);
+    const dt = new Date(ts);
+    if (!isNaN(dt.getTime())) return dt.toISOString();
+  }
+
+  // Fallback: now
+  return new Date().toISOString();
 }

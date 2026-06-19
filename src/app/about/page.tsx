@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { Mail, Target, Sparkles, ShieldCheck, TrendingUp, Heart } from "lucide-react";
 import { useLocaleState } from "@/components/elsadeq/locale-state";
+import { Breadcrumbs } from "@/components/elsadeq/breadcrumbs";
 import { getDict } from "@/lib/i18n/dictionaries";
 import { Card, CardContent } from "@/components/ui/card";
 import { Logo } from "@/components/elsadeq/logo";
@@ -15,6 +16,7 @@ export default function AboutPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-3 sm:px-4 lg:px-6 py-6 pb-24 lg:pb-12">
+      <Breadcrumbs items={[{ label: t.nav.home, href: "/" }, { label: t.nav.about }]} />
       <header className="mb-8 text-center">
         <div className="flex justify-center mb-4">
           <Logo size="xl" showGlow />

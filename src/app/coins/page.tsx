@@ -5,6 +5,7 @@ import { usePrices } from "@/hooks/use-prices";
 import { PriceCard } from "@/components/elsadeq/price-card";
 import { PriceCardSkeleton } from "@/components/elsadeq/price-card-skeleton";
 import { RefreshBar } from "@/components/elsadeq/refresh-bar";
+import { Breadcrumbs } from "@/components/elsadeq/breadcrumbs";
 import { useLocaleState } from "@/components/elsadeq/locale-state";
 import { getDict } from "@/lib/i18n/dictionaries";
 
@@ -17,6 +18,7 @@ export default function CoinsPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-3 sm:px-4 lg:px-6 py-6 pb-24 lg:pb-12">
+      <Breadcrumbs items={[{ label: t.nav.home, href: "/" }, { label: t.nav.coins }]} />
       <header className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gold-gradient font-display">
           {t.coins.title}
