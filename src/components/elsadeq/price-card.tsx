@@ -8,6 +8,7 @@ import { getDict } from "@/lib/i18n/dictionaries";
 import { useConvertedPrice, type PriceRow, type Rates } from "@/hooks/use-prices";
 import { formatPrice, relativeTime } from "@/lib/gold/prices";
 import type { Currency } from "./currency-toggle";
+import { FavoriteButton } from "./favorite-button";
 import { toast } from "sonner";
 
 interface PriceCardProps {
@@ -243,23 +244,26 @@ export function PriceCard({
       </div>
 
       {showShare && (
-        <div className="mt-3 flex items-center justify-end gap-1">
-          <button
-            onClick={handleCopy}
-            className="text-[11px] text-muted-foreground hover:text-gold transition-colors px-2 py-1 rounded inline-flex items-center gap-1"
-            aria-label={t.common.copy}
-          >
-            <Copy className="h-3 w-3" />
-            {t.common.copy}
-          </button>
-          <button
-            onClick={shareWhatsapp}
-            className="text-[11px] text-muted-foreground hover:text-green-500 transition-colors px-2 py-1 rounded inline-flex items-center gap-1"
-            aria-label={t.common.shareWhatsapp}
-          >
-            <Share2 className="h-3 w-3" />
-            {t.common.share}
-          </button>
+        <div className="mt-3 flex items-center justify-between gap-1">
+          <FavoriteButton itemKey={row.itemKey} />
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handleCopy}
+              className="text-[11px] text-muted-foreground hover:text-gold transition-colors px-2 py-1 rounded inline-flex items-center gap-1"
+              aria-label={t.common.copy}
+            >
+              <Copy className="h-3 w-3" />
+              {t.common.copy}
+            </button>
+            <button
+              onClick={shareWhatsapp}
+              className="text-[11px] text-muted-foreground hover:text-green-500 transition-colors px-2 py-1 rounded inline-flex items-center gap-1"
+              aria-label={t.common.shareWhatsapp}
+            >
+              <Share2 className="h-3 w-3" />
+              {t.common.share}
+            </button>
+          </div>
         </div>
       )}
     </div>

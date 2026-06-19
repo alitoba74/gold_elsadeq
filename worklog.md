@@ -34,3 +34,39 @@ Stage Summary:
 - المتبقي فقط: تنفيذ المستخدم لـ SQL في Supabase + رفع على GitHub + نشر على Vercel
 - ملف SQL جاهز في: /home/z/my-project/scripts/schema.sql (وكمان نسخة في /download/elsadeq-schema.sql)
 - إصلاح مهم: الـ API الصحيح لـ gold-api هو https://api.gold-api.com/price/XAU (مش www.gold-api.com/api/XAU)
+
+---
+Task ID: phase-2
+Agent: Super Z (main)
+Task: تنفيذ كل المراحل (حرجة + مهمة + تحسينات) لإخراج منتج حقيقي
+
+Work Log:
+- إضافة Service Worker حقيقي (public/sw.js) مع network-first للـ navigation + API
+- إضافة ServiceWorkerRegister component للـ production فقط
+- إضافة Schema.org JSON-LD: Organization + WebSite + ItemList of Products في layout + home
+- إضافة /api/jsonld/prices endpoint لـ Rich Snippets
+- إصلاح /api/prices/history - إزالة الـ RPC المفقود، استخدام query مباشر + sampling بـ buckets
+- إضافة rate limiting module (lib/rate-limit.ts) - 30 req/min على prices refresh، 3 req/min على contact
+- إضافة FavoriteButton على PriceCard (heart icon)
+- إضافة RSS aggregator (api/cron/fetch-news) - parser XML مخصص، deduplication بـ source_url
+- إنشاء schema-additions.sql: contact_messages + rss_feeds tables + columns إضافية على news_articles
+- إصلاح /api/contact لاستخدام contact_messages table بدلاً من audit_logs
+- استبدال <img> بـ next/image في صفحة الأخبار
+- إضافة security headers في next.config.ts: CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, HSTS
+- إضافة admin auth server-side (lib/auth/admin-guard.ts)
+- إضافة error logger (lib/error-logger.ts)
+- إصلاح bug حقيقي في convertFromEgp: كان بيقسم على rate بدلاً من (egp/rate.EGP)*rate.X - اكتشف بفضل الـ tests
+- إضافة 16 unit test لمحرك الأسعار (all pass)
+- كتابة دليل Google OAuth كامل (docs/GOOGLE_OAUTH.md)
+- تحديث vercel.json بإضافة cron للأخبار كل 30 دقيقة
+- اختبار شامل: 26 صفحة HTTP 200 + 4 API endpoints HTTP 200 + lint نظيف + 16 tests pass
+
+Stage Summary:
+- الموقع دلوقتي جاهز فعلاً كمنتج حقيقي يعتمد عليه
+- اكتشفنا وأصلحنا bug في convertFromEgp كان هيأثر على كل تحويلات العملات
+- الأسعار بتظهر بشكل صحيح: ذهب 21K = 5,797 ج.م شراء / 5,867 ج.م بيع
+- الـ JSON-LD شغال - جوجل هيظهر الأسعار كـ Rich Snippets
+- Service Worker جاهز - الموقع هيشتغل offline للأسعار المُخزّنة
+- Rate limiting شغال - مفيش حد هيعمل spam
+- المستخدم محتاج ينفذ schema-additions.sql + يظبط Google OAuth من الدليل
+- جاهزين للنشر على GitHub + Vercel

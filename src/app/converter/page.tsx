@@ -27,13 +27,15 @@ export default function ConverterPage() {
   const [from, setFrom] = React.useState<Currency>("EGP");
   const [to, setTo] = React.useState<Currency>("SAR");
 
-  // Cross-currency conversion via EGP as bridge.
-  // rates.X = USD -> X. So EGP->X = X / EGP.
+  // Cross-currency conversion via USD as bridge.
+  // rates.X = USD -> X (e.g. rates.SAR = 3.75 means 1 USD = 3.75 SAR)
+  // value (in `from`) -> USD -> `to`:
+  //   usd = value / rates[from]
+  //   result = usd * rates[to]
   const convert = (value: number, from: Currency, to: Currency): number => {
     const fRate = rates[from] || 1;
     const tRate = rates[to] || 1;
     if (!fRate || !tRate) return value;
-    // value (in `from`) -> USD -> `to`
     const usd = value / fRate;
     return usd * tRate;
   };

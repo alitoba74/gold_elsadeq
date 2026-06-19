@@ -292,11 +292,15 @@ export function computePrices(
 
 /**
  * Convert an EGP price to another currency.
+ * rates[X] = USD -> X (e.g. rates.SAR = 3.75 means 1 USD = 3.75 SAR)
+ * So EGP -> X = (egp / rates.EGP) * rates.X
  */
 export function convertFromEgp(egp: number, currency: string, rates: Record<string, number>): number {
-  const rate = rates[currency];
-  if (!rate || rate <= 0) return egp;
-  return round2(egp / rate);
+  if (currency === "EGP") return egp;
+  const usdToTarget = rates[currency];
+  const usdToEgp = rates.EGP;
+  if (!usdToTarget || !usdToEgp || usdToEgp <= 0) return egp;
+  return round2((egp / usdToEgp) * usdToTarget);
 }
 
 /**

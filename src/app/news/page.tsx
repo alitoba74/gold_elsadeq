@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { useLocaleState } from "@/components/elsadeq/locale-state";
 import { getDict } from "@/lib/i18n/dictionaries";
@@ -73,13 +74,14 @@ export default function NewsPage() {
             return (
               <Card key={n.id} className="glass-card gold-glow overflow-hidden">
                 {n.image_url && (
-                  <div className="aspect-video bg-muted overflow-hidden">
-                    {/* Using img because supabase URLs may not be next/image optimized */}
-                    <img
+                  <div className="aspect-video bg-muted overflow-hidden relative">
+                    <Image
                       src={n.image_url}
                       alt={title || ""}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover"
+                      unoptimized
                     />
                   </div>
                 )}

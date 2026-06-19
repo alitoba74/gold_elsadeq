@@ -26,8 +26,41 @@ export default function HomePage() {
 
   const Arrow = locale === "ar" ? ArrowLeft : ArrowRight;
 
+  // Build JSON-LD structured data for SEO
+  const jsonLd = React.useMemo(() => {
+    if (prices.length === 0) return null;
+    return {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "ELSADEQ Gold Prices",
+      itemListElement: prices.map((p, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        item: {
+          "@type": "Product",
+          name: locale === "ar" ? p.labelAr : p.labelEn,
+          category: "Gold",
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "EGP",
+            price: p.sellPriceEgp.toFixed(2),
+            availability: "https://schema.org/InStock",
+            url: `https://gold_elsadeq.vercel.app/${p.itemType === "bar" ? "bars" : p.itemType === "coin" ? "coins" : "gold"}`,
+            seller: { "@type": "Organization", name: "ELSADEQ" },
+          },
+        },
+      })),
+    };
+  }, [prices, locale]);
+
   return (
     <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6 py-6 pb-24 lg:pb-12">
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       {/* Hero */}
       <section className="grid gap-4 lg:grid-cols-3 lg:gap-6 mb-8">
         <div className="lg:col-span-2 space-y-3">

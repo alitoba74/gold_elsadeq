@@ -3,99 +3,106 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
-const RANGES: Record<string, string> = {
-  "24h": "24 hours",
-  "7d": "7 days",
-  "30d": "30 days",
-  "1y": "365 days",
+const RANGES: Record<string, { interval: string; maxPoints: number }> = {
+  "24h": { interval: "5 minutes", maxPoints: 60 },
+  "7d": { interval: "1 hour", maxPoints: 84 },
+  "30d": { interval: "6 hours", maxPoints: 120 },
+  "1y": { interval: "1 day", maxPoints: 365 },
 };
 
 /**
  * GET /api/prices/history?item=gold_21k&range=24h
- * Returns time-series for the chart.
+ * Returns time-series for the chart, with proper sampling.
+ * Uses direct Supabase query (no RPC needed) then samples client-side.
  */
 export async function GET(req: NextRequest) {
   const item = req.nextUrl.searchParams.get("item") || "gold_21k";
   const range = (req.nextUrl.searchParams.get("range") || "24h") as keyof typeof RANGES;
-  const interval = req.nextUrl.searchParams.get("interval") || "auto";
 
   if (!RANGES[range]) {
     return NextResponse.json({ error: "invalid range" }, { status: 400 });
   }
 
+  const cfg = RANGES[range];
   const admin = createAdminClient();
 
-  // Determine sampling interval
-  // For 24h: every record, for 7d: every 30 min, for 30d: every 4 hours, for 1y: every day
-  let bucketSql = "";
+  // Calculate time window
+  const now = new Date();
+  const since = new Date(now.getTime());
   switch (range) {
     case "24h":
-      bucketSql = "date_trunc('minute', recorded_at)";
+      since.setHours(since.getHours() - 24);
       break;
     case "7d":
-      bucketSql = "date_trunc('hour', recorded_at)";
+      since.setDate(since.getDate() - 7);
       break;
     case "30d":
-      bucketSql = "date_trunc('hour', recorded_at)";
+      since.setDate(since.getDate() - 30);
       break;
     case "1y":
-      bucketSql = "date_trunc('day', recorded_at)";
+      since.setFullYear(since.getFullYear() - 1);
       break;
   }
 
-  // Query using the bucket
-  const { data, error } = await admin.rpc("exec_sql", {
-    query_text: `
-      SELECT
-        ${bucketSql} AS bucket,
-        AVG(buy_price_egp) AS avg_buy,
-        AVG(sell_price_egp) AS avg_sell
-      FROM public.price_history
-      WHERE item_key = '${item.replace(/'/g, "''")}'
-        AND recorded_at > now() - interval '${RANGES[range]}'
-      GROUP BY bucket
-      ORDER BY bucket ASC
-      LIMIT 1000;
-    `,
-  }).single();
+  // Query raw rows (limited)
+  const { data, error } = await admin
+    .from("price_history")
+    .select("buy_price_egp, sell_price_egp, recorded_at")
+    .eq("item_key", item)
+    .gte("recorded_at", since.toISOString())
+    .order("recorded_at", { ascending: true })
+    .limit(5000);
 
-  // If RPC isn't available (no exec_sql function), fall back to direct query
   if (error) {
-    // Fallback: just get raw rows
-    const { data: raw, error: err2 } = await admin
-      .from("price_history")
-      .select("buy_price_egp, sell_price_egp, recorded_at")
-      .eq("item_key", item)
-      .order("recorded_at", { ascending: true })
-      .limit(5000);
-
-    if (err2) {
-      return NextResponse.json({ error: err2.message }, { status: 500 });
-    }
-
-    // Sample down if too many
-    const rows = raw || [];
-    const sampled = sampleDown(rows, range);
-    return NextResponse.json({
-      data: sampled.map((r) => ({
-        recordedAt: r.recorded_at,
-        price: Number(r.buy_price_egp),
-      })),
-    });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  const rows = data || [];
+
+  // Sample down to maxPoints using bucket averaging
+  const sampled = sampleDown(rows, cfg.maxPoints);
+
   return NextResponse.json({
-    data: (data || []).map((r: any) => ({
-      recordedAt: r.bucket,
-      price: Number(r.avg_buy || 0),
+    data: sampled.map((r) => ({
+      recordedAt: r.recorded_at,
+      price: Number(r.buy_price_egp),
     })),
+    count: sampled.length,
+    range,
+    item,
   });
 }
 
-function sampleDown<T extends { recorded_at: string }>(rows: T[], range: string): T[] {
-  if (rows.length === 0) return rows;
-  const maxPoints = range === "24h" ? 60 : range === "7d" ? 84 : range === "30d" ? 120 : 365;
+interface RawRow {
+  buy_price_egp: number | string;
+  sell_price_egp: number | string;
+  recorded_at: string;
+}
+
+/**
+ * Sample down rows to maxPoints using time-bucket averaging.
+ */
+function sampleDown(rows: RawRow[], maxPoints: number): RawRow[] {
+  if (rows.length === 0) return [];
   if (rows.length <= maxPoints) return rows;
+
   const step = Math.ceil(rows.length / maxPoints);
-  return rows.filter((_, i) => i % step === 0);
+  const buckets: RawRow[][] = [];
+
+  for (let i = 0; i < rows.length; i += step) {
+    buckets.push(rows.slice(i, i + step));
+  }
+
+  return buckets.map((bucket) => {
+    if (bucket.length === 1) return bucket[0];
+    const avgBuy =
+      bucket.reduce((sum, r) => sum + Number(r.buy_price_egp), 0) / bucket.length;
+    const avgSell =
+      bucket.reduce((sum, r) => sum + Number(r.sell_price_egp), 0) / bucket.length;
+    return {
+      buy_price_egp: avgBuy,
+      sell_price_egp: avgSell,
+      recorded_at: bucket[Math.floor(bucket.length / 2)].recorded_at,
+    };
+  });
 }

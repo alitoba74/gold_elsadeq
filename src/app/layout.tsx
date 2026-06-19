@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/elsadeq/theme-provider";
+import { ServiceWorkerRegister } from "@/components/elsadeq/sw-register";
 import { LocaleStateProvider } from "@/components/elsadeq/locale-state";
 import { SiteHeader } from "@/components/elsadeq/site-header";
 import { SiteFooter } from "@/components/elsadeq/site-footer";
@@ -49,18 +50,15 @@ export const metadata: Metadata = {
     "gold pound egypt",
     "حاسبة الذهب",
     "محول العملات",
+    "سبائك ذهب",
+    "gold calculator egypt",
   ],
   authors: [{ name: "ELSADEQ" }],
   creator: "ELSADEQ",
   publisher: "ELSADEQ",
   applicationName: "ELSADEQ",
-  keywords: ["ELSADEQ", "gold prices egypt", "أسعار الذهب", "سبائك", "gold pound"],
   alternates: {
     canonical: "/",
-    languages: {
-      "ar": "/ar",
-      "en": "/en",
-    },
   },
   openGraph: {
     type: "website",
@@ -103,11 +101,42 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "ELSADEQ",
+    url: "https://gold_elsadeq.vercel.app",
+    logo: "https://gold_elsadeq.vercel.app/icon-512.png",
+    description: "أسعار الذهب والسبائك والعملات الذهبية لحظة بلحظة",
+    email: "alielsadeq4@gmail.com",
+    areaServed: ["EG", "SA", "AE", "KW", "QA"],
+  };
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "ELSADEQ",
+    url: "https://gold_elsadeq.vercel.app",
+    inLanguage: ["ar", "en"],
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://gold_elsadeq.vercel.app/?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body
         className={`${cairo.variable} ${tajawal.variable} ${geistMono.variable} antialiased bg-background text-foreground min-h-screen flex flex-col`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -120,6 +149,7 @@ export default function RootLayout({
             <main className="flex-1 w-full">{children}</main>
             <SiteFooter />
             <BottomNav />
+            <ServiceWorkerRegister />
             <Toaster />
             <SonnerToaster position="top-center" />
           </LocaleStateProvider>
