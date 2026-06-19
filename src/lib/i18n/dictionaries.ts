@@ -20,6 +20,7 @@ export type Dict = {
     login: string;
     logout: string;
     profile: string;
+    alerts: string;
   };
   home: {
     heroTitle: string;
@@ -174,6 +175,7 @@ export const dictionaries: Record<Locale, Dict> = {
       login: "تسجيل الدخول",
       logout: "تسجيل الخروج",
       profile: "حسابي",
+      alerts: "التنبيهات",
     },
     home: {
       heroTitle: "أسعار الذهب والسبائك",
@@ -362,6 +364,7 @@ export const dictionaries: Record<Locale, Dict> = {
       login: "Sign In",
       logout: "Sign Out",
       profile: "Profile",
+      alerts: "Alerts",
     },
     home: {
       heroTitle: "Gold & Bullion Prices",

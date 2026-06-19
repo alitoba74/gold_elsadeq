@@ -46,6 +46,7 @@ const navLinks = [
   { key: "faq", href: "/faq" },
   { key: "about", href: "/about" },
   { key: "contact", href: "/contact" },
+  { key: "alerts", href: "/alerts" },
 ] as const;
 
 export function SiteHeader() {

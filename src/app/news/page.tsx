@@ -63,9 +63,23 @@ export default function NewsPage() {
           ))}
         </div>
       ) : items.length === 0 ? (
-        <Card className="glass-card">
-          <CardContent className="py-12 text-center text-muted-foreground">
-            {t.news.noNews}
+        <Card className="glass-card gold-glow">
+          <CardContent className="py-16 px-6 text-center">
+            <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gold/10 text-gold mb-4">
+              <Newspaper className="h-8 w-8" />
+            </div>
+            <h3 className="text-lg font-bold mb-2">
+              {locale === "ar" ? "لا توجد أخبار حالياً" : "No news yet"}
+            </h3>
+            <p className="text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed mb-4">
+              {locale === "ar"
+                ? "يقوم النظام بجمع الأخبار تلقائياً من مصادر موثوقة كل 30 دقيقة. عُد قريباً لقراءة آخر الأخبار."
+                : "Our system fetches news from trusted sources every 30 minutes. Check back soon for the latest news."}
+            </p>
+            <div className="inline-flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
+              <span className="inline-block h-2 w-2 rounded-full bg-gold live-pulse" />
+              {locale === "ar" ? "التحديث التلقائي مُفعّل" : "Auto-update is enabled"}
+            </div>
           </CardContent>
         </Card>
       ) : (

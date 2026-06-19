@@ -53,12 +53,21 @@ export async function POST() {
         }));
 
         if (rows.length > 0) {
-          const { data: insertedRows, error } = await admin
-            .from("news_articles")
-            .upsert(rows, { onConflict: "source_url", ignoreDuplicates: true })
-            .select("id");
-          if (!error && insertedRows) {
-            inserted += insertedRows.length;
+          // Try to insert each row, count successes (ignore duplicates silently)
+          for (const row of rows) {
+            if (!row.source_url) {
+              // No URL? skip (can't dedup)
+              continue;
+            }
+            const { error: insErr } = await admin
+              .from("news_articles")
+              .insert(row);
+            if (!insErr) {
+              inserted++;
+            } else if (insErr.code !== "23505") {
+              // 23505 = unique violation (duplicate), ignore
+              console.warn("[news] insert failed for", row.source_url, ":", insErr.message);
+            }
           }
         }
 

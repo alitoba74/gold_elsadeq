@@ -127,13 +127,20 @@ export function buildPageMetadata(key: keyof typeof pageMeta): Metadata {
       type: "website",
       locale: "ar_EG",
       siteName: "ELSADEQ",
-      images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: m.titleAr }],
+      images: [
+        {
+          url: `/api/og?title=${encodeURIComponent(m.titleEn)}&subtitle=${encodeURIComponent(m.descEn)}`,
+          width: 1200,
+          height: 630,
+          alt: m.titleAr,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: `${m.titleEn} | ELSADEQ`,
       description: m.descEn,
-      images: ["/og-image.jpg"],
+      images: [`/api/og?title=${encodeURIComponent(m.titleEn)}&subtitle=${encodeURIComponent(m.descEn)}`],
     },
   };
 }

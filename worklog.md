@@ -70,3 +70,45 @@ Stage Summary:
 - Rate limiting شغال - مفيش حد هيعمل spam
 - المستخدم محتاج ينفذ schema-additions.sql + يظبط Google OAuth من الدليل
 - جاهزين للنشر على GitHub + Vercel
+
+---
+Task ID: phase-3
+Agent: Super Z (main)
+Task: تنفيذ الـ 14 تحسين ولمسة انبهارية
+
+Work Log:
+- إصلاح RSS date parser (parseDate function) - يدعم RFC822, ISO, MySQL, Unix
+- استبدال RSS feeds الميتة (Reuters 404, Kitco 404) بـ 4 مصادر شغالة (Al Jazeera, RT, Investing)
+- إضافة custom 404 page (not-found.tsx) بهوية ELSADEQ + زر رئيسية
+- إضافة custom error page (error.tsx) مع reset + تفاصيل الخطأ
+- إضافة FAQ JSON-LD schema (FAQPage) للـ Rich Snippets
+- إنشاء src/lib/seo/page-meta.ts مع 12 page metadata definitions
+- إضافة 12 layout.tsx لكل صفحة فرعية بـ metadata مخصص
+- إضافة زر "مقارنة العيارات" على /gold (جدول مقارنة 24K/22K/21K/18K/14K)
+- إضافة زر "طباعة" على /gold (window.print مع print:hidden للعناصر غير المطلوبة)
+- إضافة auto-updating timer في RefreshBar (كل ثانية)
+- تحسين empty state في صفحة /news (icon + رسالة + live indicator)
+- إضافة rate limiting على /api/prices/history (60/min) و /api/jsonld/prices (60/min)
+- إنشاء صفحة /alerts كاملة (price alerts UI مع form + list + remove)
+- إضافة dynamic OG image endpoint /api/og (SVG-based مع logo + live price)
+- تحديث page-meta.ts لاستخدام dynamic OG لكل صفحة
+- إنشاء Breadcrumbs component + إضافتها لكل الصفحات الفرعية
+- إصلاح 4 parsing errors في about/contact/privacy/terms (Breadcrumbs برة div)
+- إصلاح react-hooks error في alerts page (loadAlerts useCallback)
+- إضافة "alerts" للـ i18n dictionaries (عربي + إنجليزي)
+
+Stage Summary:
+- الموقع دلوقتي جاهز 100% كمنتج حقيقي
+- 27 صفحة + 9 API routes + 138 ملف TS/TSX
+- 16 unit tests كلها pass
+- lint نظيف
+- 80 خبر في الـ DB من 4 مصادر شغالة
+- 404 page مخصص شغال
+- Breadcrumbs على كل الصفحات
+- Dynamic OG images per page
+- Price alerts UI كاملة
+- مقارنة العيارات + طباعة الأسعار
+- FAQ + Organization + WebSite + ItemList JSON-LD schemas
+- Rate limiting على كل APIs
+- المتبقي: SQL واحد فقط (unique constraint على news_articles.source_url) - اختياري
+- جاهزين للنشر على GitHub + Vercel

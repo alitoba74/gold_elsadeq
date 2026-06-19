@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -14,8 +15,13 @@ const RANGES: Record<string, { interval: string; maxPoints: number }> = {
  * GET /api/prices/history?item=gold_21k&range=24h
  * Returns time-series for the chart, with proper sampling.
  * Uses direct Supabase query (no RPC needed) then samples client-side.
+ * Rate limited to 60 requests/minute per IP.
  */
 export async function GET(req: NextRequest) {
+  // Rate limit
+  const limited = rateLimit(req, 60);
+  if (limited) return limited;
+
   const item = req.nextUrl.searchParams.get("item") || "gold_21k";
   const range = (req.nextUrl.searchParams.get("range") || "24h") as keyof typeof RANGES;
 

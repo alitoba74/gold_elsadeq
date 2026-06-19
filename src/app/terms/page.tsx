@@ -95,8 +95,8 @@ export default function TermsPage() {
   ];
 
   return (
-    <Breadcrumbs items={[{ label: t.nav.home, href: "/" }, { label: t.nav.terms }]} />
-      <div className="mx-auto max-w-3xl px-3 sm:px-4 lg:px-6 py-6 pb-24 lg:pb-12">
+    <div className="mx-auto max-w-3xl px-3 sm:px-4 lg:px-6 py-6 pb-24 lg:pb-12">
+      <Breadcrumbs items={[{ label: t.nav.home, href: "/" }, { label: t.nav.terms }]} />
       <header className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gold-gradient font-display">
           {t.terms.title}

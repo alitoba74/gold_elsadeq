@@ -1,4 +1,6 @@
+import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 60;
@@ -7,8 +9,13 @@ export const revalidate = 60;
  * GET /api/jsonld/prices
  * Returns Schema.org JSON-LD for the homepage prices.
  * Used by search engines to display rich snippets.
+ * Rate limited to 60 requests/minute per IP.
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
+  // Rate limit
+  const limited = rateLimit(req, 60);
+  if (limited) return limited;
+
   try {
     const admin = createAdminClient();
     const { data } = await admin
